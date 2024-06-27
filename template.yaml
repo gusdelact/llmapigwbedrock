@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  llmapigw
+
+  LLM API Gateway
+  
+Resources:
+  LLMLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: llm.lambda_handler  # Nombre de tu archivo de función y la función handler
+      Runtime: python3.9  # O el entorno de tiempo de ejecución que estés utilizando
+      CodeUri: ./llm  # Ruta a tu código de Lambda
+      MemorySize: 128  # Tamaño de memoria asignada a la función Lambda
+      Timeout: 120  # Tiempo máximo de ejecución en segundos, 120 segundos para esperar la respuesta sincrona de Bedrock
+      Role: "arn:aws:iam::PonerAccountID:role/llmapigw-LLMLambdaFunctionRole"
+      Events:
+        ApiGatewayEvent:
+          Type: Api
+          Properties:
+            Path: /invoke  # Ruta en  API Gateway
+            Method: POST  # Método HTTP (GET, POST, etc.)
+
+Outputs:
+  ApiEndpoint:
+    Description: URL de la API Gateway recién creada
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/invoke"
